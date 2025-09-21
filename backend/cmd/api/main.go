@@ -89,9 +89,13 @@ func main() {
 	router.GET(
 		"/global-messages", func(c *gin.Context) {
 			var messages []models.Message
-			if err := db.Order("created_at asc").Limit(100).Find(&messages).Error; err != nil {
+			if err := db.Order("created_at desc").Limit(100).Find(&messages).Error; err != nil {
 				c.AbortWithStatus(http.StatusInternalServerError)
 				return
+			}
+
+			for i, j := 0, len(messages)-1; i < j; i, j = i+1, j-1 {
+				messages[i], messages[j] = messages[j], messages[i]
 			}
 
 			c.JSON(
