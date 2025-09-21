@@ -2,6 +2,7 @@ package mq
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"sync"
 
@@ -25,6 +26,8 @@ func Init() *amqp.Channel {
 				"amqp://%s:%s@%s:%s/",
 				mqUser, mqPassword, mqHost, mqPort,
 			)
+
+			log.Println(url)
 
 			connection, err := amqp.Dial(url)
 			if err != nil {
