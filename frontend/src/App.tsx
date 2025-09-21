@@ -39,7 +39,12 @@ export const App = () => {
   useEffect(() => {
     try {
       if (lastJsonMessage) {
-        setMessages((prev) => [...prev, lastJsonMessage as Chat]);
+        setMessages((prev) => {
+          const newMessages = [...prev, lastJsonMessage as Chat];
+          return newMessages.length > 100
+            ? newMessages.slice(-100)
+            : newMessages;
+        });
       }
     } catch (e) {
       console.log(e);
