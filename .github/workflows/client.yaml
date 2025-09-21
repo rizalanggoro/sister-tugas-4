@@ -7,9 +7,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
 
     steps:
       - name: Checkout repository
@@ -30,6 +27,7 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
+          context: ./frontend
           platforms: linux/amd64,linux/arm64
           # push: true
           # tags: rizalanggoro/frontend-presensigo:latest
