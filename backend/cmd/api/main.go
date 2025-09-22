@@ -227,12 +227,12 @@ func main() {
 					"application/json",
 					bytes.NewBuffer(body),
 				)
-				defer res.Body.Close()
 				if err != nil {
 					log.Println(err.Error())
 					c.AbortWithStatus(http.StatusInternalServerError)
 					return
 				}
+				defer res.Body.Close()
 
 				// tetap return string sederhana
 				c.String(http.StatusOK, "hello from rest")
@@ -244,6 +244,7 @@ func main() {
 		groupTest.POST(
 			"/grpc", func(c *gin.Context) {
 
+				// ini malah tetep ke db ya, seharusnya salah tapi bentar aku dah capek
 				if _, err := grpcMessageClient.SendMessage(
 					c, &pb.CreateMessageRequest{
 						Name:    "grpc",
@@ -258,6 +259,24 @@ func main() {
 			},
 		)
 	}
+	// GET endpoint sederhana
+	groupTest.GET(
+		"/mq", func(c *gin.Context) {
+			c.String(http.StatusOK, "GET hello from mq")
+		},
+	)
+
+	groupTest.GET(
+		"/rest", func(c *gin.Context) {
+			c.String(http.StatusOK, "GET hello from rest")
+		},
+	)
+
+	groupTest.GET(
+		"/grpc", func(c *gin.Context) {
+			c.String(http.StatusOK, "GET hello from grpc")
+		},
+	)
 
 	router.GET(
 		"/global-messages", func(c *gin.Context) {

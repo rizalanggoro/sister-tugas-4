@@ -6,14 +6,15 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	amqp "github.com/rabbitmq/amqp091-go"
 	"sister/internal/dto/requests"
 	"sister/internal/models"
 	"sister/pkg/database"
 	"sister/pkg/mq"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 func main() {
@@ -96,6 +97,17 @@ func main() {
 			c.JSON(http.StatusOK, gin.H{"status": "success"})
 		},
 	)
+	router.POST("/test-worker", func(c *gin.Context) {
+		// contoh sederhana: terima body JSON
+		var msg map[string]interface{}
+		if err := c.BindJSON(&msg); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
+			return
+		}
+
+		// balikin response sederhana
+		c.String(http.StatusOK, "hello from worker")
+	})
 
 	router.Run(":8082")
 }
