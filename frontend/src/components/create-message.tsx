@@ -1,6 +1,14 @@
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { zodResolver } from "@hookform/resolvers/zod/dist/zod.js";
 import { useMutation } from "@tanstack/react-query";
 import { LoaderIcon, SendIcon } from "lucide-react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import z from "zod";
 import { Button } from "./ui/button";
@@ -19,16 +27,21 @@ interface Chat {
 }
 
 export const CreateMessage = () => {
+  const [protocol, setProtocol] = useState("mq");
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
   });
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (data: Chat) => {
-      fetch(`${import.meta.env.VITE_API_BASE_URL}/global-messages`, {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/global-messages/${protocol}`,
+        {
+          method: "POST",
+          body: JSON.stringify(data),
+        }
+      );
     },
     onSuccess: () => {
       form.reset({ message: "" });
@@ -50,6 +63,16 @@ export const CreateMessage = () => {
             render={({ field }) => (
               <FormItem>
                 <div className="flex items-center gap-2 p-4">
+                  <Select value={protocol} onValueChange={setProtocol}>
+                    <SelectTrigger className="w-40">
+                      <SelectValue placeholder="Protocol" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="mq">MQ</SelectItem>
+                      <SelectItem value="rest">REST</SelectItem>
+                      <SelectItem value="grpc">gRPC</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <FormControl>
                     <Input placeholder="Masukkan pesan" {...field} />
                   </FormControl>
