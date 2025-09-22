@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -52,40 +54,85 @@ func main() {
 		panic(err)
 	}
 
-	router.POST(
-		"/global-messages", func(c *gin.Context) {
-			var req requests.CreateGlobalMessage
-			if err := c.ShouldBindJSON(&req); err != nil {
-				c.AbortWithStatus(http.StatusBadRequest)
-				return
-			}
+	group := router.Group("/global-messages")
+	{
+		// endpoint untuk membuat pesan menggunakan message queue
+		// sifatnya asynchronous
+		group.POST(
+			"/mq", func(c *gin.Context) {
+				var req requests.CreateGlobalMessage
+				if err := c.ShouldBindJSON(&req); err != nil {
+					c.AbortWithStatus(http.StatusBadRequest)
+					return
+				}
 
-			// ubah pesan ke dalam bentuk string json
-			body, err := json.Marshal(req)
-			if err != nil {
-				log.Println(err.Error())
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
+				// ubah pesan ke dalam bentuk string json
+				body, err := json.Marshal(req)
+				if err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
 
-			if err := ch.Publish(
-				"",
-				globalMessageQueue.Name,
-				false,
-				false,
-				amqp.Publishing{
-					ContentType: "application/json",
-					Body:        body,
-				},
-			); err != nil {
-				log.Println(err.Error())
-				c.AbortWithStatus(http.StatusInternalServerError)
-				return
-			}
+				if err := ch.Publish(
+					"",
+					globalMessageQueue.Name,
+					false,
+					false,
+					amqp.Publishing{
+						ContentType: "application/json",
+						Body:        body,
+					},
+				); err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
 
-			c.JSON(http.StatusAccepted, gin.H{"status": "accepted"})
-		},
-	)
+				c.JSON(http.StatusAccepted, gin.H{"status": "accepted"})
+			},
+		)
+
+		// endpoint untuk membuat pesan menggunakan rest api
+		// sifatnya synchronous
+		group.POST(
+			"/rest", func(c *gin.Context) {
+				var req requests.CreateGlobalMessage
+				if err := c.ShouldBindJSON(&req); err != nil {
+					c.AbortWithStatus(http.StatusBadRequest)
+					return
+				}
+
+				body, err := json.Marshal(req)
+				if err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
+
+				// teruskan pesan ke worker melalui rest api
+				baseUrl := os.Getenv("WORKER_REST_API_BASE_URL")
+				res, err := http.Post(
+					fmt.Sprintf("%s/global-messages", baseUrl),
+					"application/json",
+					bytes.NewBuffer(body),
+				)
+				defer res.Body.Close()
+				if err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
+
+				c.JSON(http.StatusOK, gin.H{"status": "success"})
+			},
+		)
+
+		// endpoint untuk membuat pesan menggunakan grpc
+		// sifatnya synchronous
+		group.POST("/grpc")
+	}
+
 	router.GET(
 		"/global-messages", func(c *gin.Context) {
 			var messages []models.Message

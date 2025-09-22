@@ -9,7 +9,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o app ./cmd/worker
+RUN go build -o app ./cmd/worker/mq
 
 FROM alpine:3.22
 
