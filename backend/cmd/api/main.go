@@ -8,20 +8,27 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"sister/internal/dto/requests"
 	"sister/internal/dto/responses"
 	"sister/internal/models"
 	"sister/pkg/database"
 	pb "sister/pkg/grpc"
 	"sister/pkg/mq"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
+type Message struct {
+	Name    string `json:"name"`
+	Message string `json:"message"`
+}
+
+// Berarti ini code Rest API pake gin
 func main() {
 	appEnv := os.Getenv("APP_ENV")
 	if appEnv == "" {
@@ -67,6 +74,15 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
+	q, err := ch.QueueDeclare(
+		"hello-queue",
+		false,
+		false,
+		false,
+		false,
+		nil,
+	)
 
 	group := router.Group("/global-messages")
 	{
@@ -162,6 +178,82 @@ func main() {
 					c.AbortWithStatus(http.StatusInternalServerError)
 				} else {
 					c.JSON(http.StatusOK, gin.H{"status": "success"})
+				}
+			},
+		)
+	}
+
+	groupTest := router.Group("/test-worker")
+	{
+		// endpoint untuk mereturn string
+		// sifatnya asynchronous
+		groupTest.POST(
+			"/mq", func(c *gin.Context) {
+				msg := Message{Name: "mq", Message: "Hello from MQ!"}
+				// ubah pesan ke dalam bentuk string json
+				body, _ := json.Marshal(msg)
+				if err := ch.Publish(
+					"",
+					q.Name,
+					false,
+					false,
+					amqp.Publishing{
+						ContentType: "application/json",
+						Body:        body,
+					},
+				); err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
+
+				// tetap return string sederhana
+				c.String(http.StatusAccepted, "hello from mq")
+			},
+		)
+
+		// endpoint untuk mereturn string
+		// sifatnya synchronous
+		groupTest.POST(
+			"/rest", func(c *gin.Context) {
+				msg := Message{Name: "rest", Message: "Hello from Rest!"}
+				// ubah pesan ke dalam bentuk string json
+				body, _ := json.Marshal(msg)
+
+				// teruskan pesan ke worker melalui rest api
+				baseUrl := os.Getenv("WORKER_REST_API_BASE_URL")
+				res, err := http.Post(
+					fmt.Sprintf("%s/test-worker", baseUrl),
+					"application/json",
+					bytes.NewBuffer(body),
+				)
+				defer res.Body.Close()
+				if err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
+
+				// tetap return string sederhana
+				c.String(http.StatusOK, "hello from rest")
+			},
+		)
+
+		// endpoint untuk mereturn string
+		// sifatnya synchronous
+		groupTest.POST(
+			"/grpc", func(c *gin.Context) {
+
+				if _, err := grpcMessageClient.SendMessage(
+					c, &pb.CreateMessageRequest{
+						Name:    "grpc",
+						Message: "hello from grpc",
+					},
+				); err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+				} else {
+					c.String(http.StatusOK, "hello from grpc")
 				}
 			},
 		)
