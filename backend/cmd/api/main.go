@@ -12,10 +12,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	amqp "github.com/rabbitmq/amqp091-go"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"sister/internal/dto/requests"
 	"sister/internal/dto/responses"
 	"sister/internal/models"
 	"sister/pkg/database"
+	pb "sister/pkg/grpc"
 	"sister/pkg/mq"
 )
 
@@ -41,6 +44,17 @@ func main() {
 	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Authorization"}
 	corsConfig.AllowCredentials = true
 	router.Use(cors.New(corsConfig))
+
+	// grpc connection
+	grpcConn, err := grpc.NewClient(
+		os.Getenv("WORKER_GRPC_BASE_URL"),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		panic(err)
+	}
+	defer grpcConn.Close()
+	grpcMessageClient := pb.NewMessageClient(grpcConn)
 
 	globalMessageQueue, err := ch.QueueDeclare(
 		"global-message",
@@ -130,7 +144,27 @@ func main() {
 
 		// endpoint untuk membuat pesan menggunakan grpc
 		// sifatnya synchronous
-		group.POST("/grpc")
+		group.POST(
+			"/grpc", func(c *gin.Context) {
+				var req requests.CreateGlobalMessage
+				if err := c.ShouldBindJSON(&req); err != nil {
+					c.AbortWithStatus(http.StatusBadRequest)
+					return
+				}
+
+				if _, err := grpcMessageClient.SendMessage(
+					c, &pb.CreateMessageRequest{
+						Name:    req.Name,
+						Message: req.Message,
+					},
+				); err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+				} else {
+					c.JSON(http.StatusOK, gin.H{"status": "success"})
+				}
+			},
+		)
 	}
 
 	router.GET(

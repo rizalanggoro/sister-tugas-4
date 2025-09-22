@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package message;
+
+option go_package = "pkg/grpc";
+
+service Message {
+  rpc SendMessage (CreateMessageRequest) returns (CreateMessageResponse) {}
+}
+
+message CreateMessageRequest {
+  string name = 1;
+  string message = 2;
+}
+
+message CreateMessageResponse {
+  uint64 id = 1;
+}
