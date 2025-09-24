@@ -6,6 +6,7 @@ option go_package = "pkg/grpc";
 
 service Message {
   rpc SendMessage (CreateMessageRequest) returns (CreateMessageResponse) {}
+  rpc SendMessageDummy (CreateMessageRequest) returns (CreateMessageResponse);
 }
 
 message CreateMessageRequest {

@@ -7,14 +7,15 @@ import (
 	"net"
 	"os"
 
-	"github.com/joho/godotenv"
-	amqp "github.com/rabbitmq/amqp091-go"
-	"google.golang.org/grpc"
-	"gorm.io/gorm"
 	"sister/internal/models"
 	"sister/pkg/database"
 	pb "sister/pkg/grpc"
 	"sister/pkg/mq"
+
+	"github.com/joho/godotenv"
+	amqp "github.com/rabbitmq/amqp091-go"
+	"google.golang.org/grpc"
+	"gorm.io/gorm"
 )
 
 var (
@@ -24,6 +25,7 @@ var (
 
 type MessageServer struct {
 	pb.UnimplementedMessageServer
+	mode string
 }
 
 func (s *MessageServer) SendMessage(_ context.Context, req *pb.CreateMessageRequest) (
@@ -58,6 +60,17 @@ func (s *MessageServer) SendMessage(_ context.Context, req *pb.CreateMessageRequ
 
 	return &pb.CreateMessageResponse{
 		Id: uint64(data.ID),
+	}, nil
+}
+
+func (s *MessageServer) SendMessageDummy(_ context.Context, req *pb.CreateMessageRequest) (
+	*pb.CreateMessageResponse, error,
+) {
+	log.Printf("Dummy receive: name=%s message=%s", req.Name, req.Message)
+
+	// langsung return tanpa DB/MQ
+	return &pb.CreateMessageResponse{
+		Id: 999, // ID dummy
 	}, nil
 }
 

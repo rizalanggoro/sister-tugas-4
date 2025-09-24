@@ -126,9 +126,10 @@ const file_pkg_grpc_message_proto_rawDesc = "" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"'\n" +
 	"\x15CreateMessageResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x04R\x02id2Y\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id2\xac\x01\n" +
 	"\aMessage\x12N\n" +
-	"\vSendMessage\x12\x1d.message.CreateMessageRequest\x1a\x1e.message.CreateMessageResponse\"\x00B\n" +
+	"\vSendMessage\x12\x1d.message.CreateMessageRequest\x1a\x1e.message.CreateMessageResponse\"\x00\x12Q\n" +
+	"\x10SendMessageDummy\x12\x1d.message.CreateMessageRequest\x1a\x1e.message.CreateMessageResponseB\n" +
 	"Z\bpkg/grpcb\x06proto3"
 
 var (
@@ -150,9 +151,11 @@ var file_pkg_grpc_message_proto_goTypes = []any{
 }
 var file_pkg_grpc_message_proto_depIdxs = []int32{
 	0, // 0: message.Message.SendMessage:input_type -> message.CreateMessageRequest
-	1, // 1: message.Message.SendMessage:output_type -> message.CreateMessageResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
+	0, // 1: message.Message.SendMessageDummy:input_type -> message.CreateMessageRequest
+	1, // 2: message.Message.SendMessage:output_type -> message.CreateMessageResponse
+	1, // 3: message.Message.SendMessageDummy:output_type -> message.CreateMessageResponse
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
 	0, // [0:0] is the sub-list for extension extendee
 	0, // [0:0] is the sub-list for field type_name

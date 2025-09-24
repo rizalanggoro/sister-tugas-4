@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	Message_SendMessage_FullMethodName = "/message.Message/SendMessage"
+	Message_SendMessage_FullMethodName      = "/message.Message/SendMessage"
+	Message_SendMessageDummy_FullMethodName = "/message.Message/SendMessageDummy"
 )
 
 // MessageClient is the client API for Message service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageClient interface {
 	SendMessage(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error)
+	SendMessageDummy(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error)
 }
 
 type messageClient struct {
@@ -47,11 +49,22 @@ func (c *messageClient) SendMessage(ctx context.Context, in *CreateMessageReques
 	return out, nil
 }
 
+func (c *messageClient) SendMessageDummy(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateMessageResponse)
+	err := c.cc.Invoke(ctx, Message_SendMessageDummy_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MessageServer is the server API for Message service.
 // All implementations must embed UnimplementedMessageServer
 // for forward compatibility.
 type MessageServer interface {
 	SendMessage(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error)
+	SendMessageDummy(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error)
 	mustEmbedUnimplementedMessageServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedMessageServer struct{}
 
 func (UnimplementedMessageServer) SendMessage(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
+}
+func (UnimplementedMessageServer) SendMessageDummy(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendMessageDummy not implemented")
 }
 func (UnimplementedMessageServer) mustEmbedUnimplementedMessageServer() {}
 func (UnimplementedMessageServer) testEmbeddedByValue()                 {}
@@ -104,6 +120,24 @@ func _Message_SendMessage_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Message_SendMessageDummy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateMessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServer).SendMessageDummy(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Message_SendMessageDummy_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServer).SendMessageDummy(ctx, req.(*CreateMessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Message_ServiceDesc is the grpc.ServiceDesc for Message service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var Message_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SendMessage",
 			Handler:    _Message_SendMessage_Handler,
+		},
+		{
+			MethodName: "SendMessageDummy",
+			Handler:    _Message_SendMessageDummy_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -98,13 +98,6 @@ func main() {
 		},
 	)
 	router.POST("/test-worker", func(c *gin.Context) {
-		// contoh sederhana: terima body JSON
-		var msg map[string]interface{}
-		if err := c.BindJSON(&msg); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid body"})
-			return
-		}
-
 		// balikin response sederhana
 		c.String(http.StatusOK, "hello from worker")
 	})
