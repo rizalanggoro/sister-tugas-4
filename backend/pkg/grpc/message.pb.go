@@ -21,6 +21,102 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type CreateDummyMessageRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDummyMessageRequest) Reset() {
+	*x = CreateDummyMessageRequest{}
+	mi := &file_pkg_grpc_message_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDummyMessageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDummyMessageRequest) ProtoMessage() {}
+
+func (x *CreateDummyMessageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_message_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDummyMessageRequest.ProtoReflect.Descriptor instead.
+func (*CreateDummyMessageRequest) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_message_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *CreateDummyMessageRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateDummyMessageRequest) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+type CreateDummyMessageResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Message       string                 `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDummyMessageResponse) Reset() {
+	*x = CreateDummyMessageResponse{}
+	mi := &file_pkg_grpc_message_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDummyMessageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDummyMessageResponse) ProtoMessage() {}
+
+func (x *CreateDummyMessageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_pkg_grpc_message_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDummyMessageResponse.ProtoReflect.Descriptor instead.
+func (*CreateDummyMessageResponse) Descriptor() ([]byte, []int) {
+	return file_pkg_grpc_message_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *CreateDummyMessageResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
 type CreateMessageRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -31,7 +127,7 @@ type CreateMessageRequest struct {
 
 func (x *CreateMessageRequest) Reset() {
 	*x = CreateMessageRequest{}
-	mi := &file_pkg_grpc_message_proto_msgTypes[0]
+	mi := &file_pkg_grpc_message_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +139,7 @@ func (x *CreateMessageRequest) String() string {
 func (*CreateMessageRequest) ProtoMessage() {}
 
 func (x *CreateMessageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_grpc_message_proto_msgTypes[0]
+	mi := &file_pkg_grpc_message_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +152,7 @@ func (x *CreateMessageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMessageRequest.ProtoReflect.Descriptor instead.
 func (*CreateMessageRequest) Descriptor() ([]byte, []int) {
-	return file_pkg_grpc_message_proto_rawDescGZIP(), []int{0}
+	return file_pkg_grpc_message_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateMessageRequest) GetName() string {
@@ -82,7 +178,7 @@ type CreateMessageResponse struct {
 
 func (x *CreateMessageResponse) Reset() {
 	*x = CreateMessageResponse{}
-	mi := &file_pkg_grpc_message_proto_msgTypes[1]
+	mi := &file_pkg_grpc_message_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +190,7 @@ func (x *CreateMessageResponse) String() string {
 func (*CreateMessageResponse) ProtoMessage() {}
 
 func (x *CreateMessageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_pkg_grpc_message_proto_msgTypes[1]
+	mi := &file_pkg_grpc_message_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +203,7 @@ func (x *CreateMessageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMessageResponse.ProtoReflect.Descriptor instead.
 func (*CreateMessageResponse) Descriptor() ([]byte, []int) {
-	return file_pkg_grpc_message_proto_rawDescGZIP(), []int{1}
+	return file_pkg_grpc_message_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CreateMessageResponse) GetId() uint64 {
@@ -121,15 +217,20 @@ var File_pkg_grpc_message_proto protoreflect.FileDescriptor
 
 const file_pkg_grpc_message_proto_rawDesc = "" +
 	"\n" +
-	"\x16pkg/grpc/message.proto\x12\amessage\"D\n" +
+	"\x16pkg/grpc/message.proto\x12\amessage\"I\n" +
+	"\x19CreateDummyMessageRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"6\n" +
+	"\x1aCreateDummyMessageResponse\x12\x18\n" +
+	"\amessage\x18\x01 \x01(\tR\amessage\"D\n" +
 	"\x14CreateMessageRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"'\n" +
 	"\x15CreateMessageResponse\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\x04R\x02id2\xac\x01\n" +
-	"\aMessage\x12N\n" +
-	"\vSendMessage\x12\x1d.message.CreateMessageRequest\x1a\x1e.message.CreateMessageResponse\"\x00\x12Q\n" +
-	"\x10SendMessageDummy\x12\x1d.message.CreateMessageRequest\x1a\x1e.message.CreateMessageResponseB\n" +
+	"\x02id\x18\x01 \x01(\x04R\x02id2\xb4\x01\n" +
+	"\aMessage\x12L\n" +
+	"\vSendMessage\x12\x1d.message.CreateMessageRequest\x1a\x1e.message.CreateMessageResponse\x12[\n" +
+	"\x10SendDummyMessage\x12\".message.CreateDummyMessageRequest\x1a#.message.CreateDummyMessageResponseB\n" +
 	"Z\bpkg/grpcb\x06proto3"
 
 var (
@@ -144,16 +245,18 @@ func file_pkg_grpc_message_proto_rawDescGZIP() []byte {
 	return file_pkg_grpc_message_proto_rawDescData
 }
 
-var file_pkg_grpc_message_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_pkg_grpc_message_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_pkg_grpc_message_proto_goTypes = []any{
-	(*CreateMessageRequest)(nil),  // 0: message.CreateMessageRequest
-	(*CreateMessageResponse)(nil), // 1: message.CreateMessageResponse
+	(*CreateDummyMessageRequest)(nil),  // 0: message.CreateDummyMessageRequest
+	(*CreateDummyMessageResponse)(nil), // 1: message.CreateDummyMessageResponse
+	(*CreateMessageRequest)(nil),       // 2: message.CreateMessageRequest
+	(*CreateMessageResponse)(nil),      // 3: message.CreateMessageResponse
 }
 var file_pkg_grpc_message_proto_depIdxs = []int32{
-	0, // 0: message.Message.SendMessage:input_type -> message.CreateMessageRequest
-	0, // 1: message.Message.SendMessageDummy:input_type -> message.CreateMessageRequest
-	1, // 2: message.Message.SendMessage:output_type -> message.CreateMessageResponse
-	1, // 3: message.Message.SendMessageDummy:output_type -> message.CreateMessageResponse
+	2, // 0: message.Message.SendMessage:input_type -> message.CreateMessageRequest
+	0, // 1: message.Message.SendDummyMessage:input_type -> message.CreateDummyMessageRequest
+	3, // 2: message.Message.SendMessage:output_type -> message.CreateMessageResponse
+	1, // 3: message.Message.SendDummyMessage:output_type -> message.CreateDummyMessageResponse
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -172,7 +275,7 @@ func file_pkg_grpc_message_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_pkg_grpc_message_proto_rawDesc), len(file_pkg_grpc_message_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

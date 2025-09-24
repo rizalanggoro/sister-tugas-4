@@ -20,7 +20,7 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	Message_SendMessage_FullMethodName      = "/message.Message/SendMessage"
-	Message_SendMessageDummy_FullMethodName = "/message.Message/SendMessageDummy"
+	Message_SendDummyMessage_FullMethodName = "/message.Message/SendDummyMessage"
 )
 
 // MessageClient is the client API for Message service.
@@ -28,7 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageClient interface {
 	SendMessage(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error)
-	SendMessageDummy(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error)
+	SendDummyMessage(ctx context.Context, in *CreateDummyMessageRequest, opts ...grpc.CallOption) (*CreateDummyMessageResponse, error)
 }
 
 type messageClient struct {
@@ -49,10 +49,10 @@ func (c *messageClient) SendMessage(ctx context.Context, in *CreateMessageReques
 	return out, nil
 }
 
-func (c *messageClient) SendMessageDummy(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error) {
+func (c *messageClient) SendDummyMessage(ctx context.Context, in *CreateDummyMessageRequest, opts ...grpc.CallOption) (*CreateDummyMessageResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CreateMessageResponse)
-	err := c.cc.Invoke(ctx, Message_SendMessageDummy_FullMethodName, in, out, cOpts...)
+	out := new(CreateDummyMessageResponse)
+	err := c.cc.Invoke(ctx, Message_SendDummyMessage_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (c *messageClient) SendMessageDummy(ctx context.Context, in *CreateMessageR
 // for forward compatibility.
 type MessageServer interface {
 	SendMessage(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error)
-	SendMessageDummy(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error)
+	SendDummyMessage(context.Context, *CreateDummyMessageRequest) (*CreateDummyMessageResponse, error)
 	mustEmbedUnimplementedMessageServer()
 }
 
@@ -78,8 +78,8 @@ type UnimplementedMessageServer struct{}
 func (UnimplementedMessageServer) SendMessage(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendMessage not implemented")
 }
-func (UnimplementedMessageServer) SendMessageDummy(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendMessageDummy not implemented")
+func (UnimplementedMessageServer) SendDummyMessage(context.Context, *CreateDummyMessageRequest) (*CreateDummyMessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SendDummyMessage not implemented")
 }
 func (UnimplementedMessageServer) mustEmbedUnimplementedMessageServer() {}
 func (UnimplementedMessageServer) testEmbeddedByValue()                 {}
@@ -120,20 +120,20 @@ func _Message_SendMessage_Handler(srv interface{}, ctx context.Context, dec func
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Message_SendMessageDummy_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateMessageRequest)
+func _Message_SendDummyMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDummyMessageRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MessageServer).SendMessageDummy(ctx, in)
+		return srv.(MessageServer).SendDummyMessage(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Message_SendMessageDummy_FullMethodName,
+		FullMethod: Message_SendDummyMessage_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MessageServer).SendMessageDummy(ctx, req.(*CreateMessageRequest))
+		return srv.(MessageServer).SendDummyMessage(ctx, req.(*CreateDummyMessageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -150,8 +150,8 @@ var Message_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _Message_SendMessage_Handler,
 		},
 		{
-			MethodName: "SendMessageDummy",
-			Handler:    _Message_SendMessageDummy_Handler,
+			MethodName: "SendDummyMessage",
+			Handler:    _Message_SendDummyMessage_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

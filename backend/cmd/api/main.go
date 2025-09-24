@@ -174,70 +174,67 @@ func main() {
 		)
 	}
 
-	groupTest := router.Group("/test-worker")
+	dummyGroup := router.Group("/dummy-global-messages")
 	{
-
-		// endpoint untuk mereturn string
+		// endpoint untuk membuat pesan dummy menggunakan rest
 		// sifatnya synchronous
-		groupTest.POST(
+		dummyGroup.POST(
 			"/rest", func(c *gin.Context) {
-				msg := Message{Name: "rest", Message: "Hello from Rest!"}
-				// ubah pesan ke dalam bentuk string json
-				body, _ := json.Marshal(msg)
+				var req requests.CreateGlobalMessage
+				if err := c.ShouldBindJSON(&req); err != nil {
+					c.AbortWithStatus(http.StatusBadRequest)
+					return
+				}
+
+				reqStr, err := json.Marshal(req)
+				if err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+					return
+				}
 
 				// teruskan pesan ke worker melalui rest api
-				baseUrl := os.Getenv("WORKER_REST_API_BASE_URL")
-				res, err := http.Post(
-					fmt.Sprintf("%s/test-worker", baseUrl),
+				if res, err := http.Post(
+					fmt.Sprintf(
+						"%s/dummy-global-messages",
+						os.Getenv("WORKER_REST_API_BASE_URL"),
+					),
 					"application/json",
-					bytes.NewBuffer(body),
-				)
-				if err != nil {
+					bytes.NewBuffer(reqStr),
+				); err != nil {
 					log.Println(err.Error())
 					c.AbortWithStatus(http.StatusInternalServerError)
-					return
+				} else {
+					defer res.Body.Close()
+					c.JSON(http.StatusOK, gin.H{"status": "success"})
 				}
-				defer res.Body.Close()
-
-				// tetap return string sederhana
-				c.String(http.StatusOK, "hello from rest")
 			},
 		)
 
-		// endpoint untuk mereturn string
+		// endpoint untuk membuat pesan dummy menggunakan grpc
 		// sifatnya synchronous
-		groupTest.POST(
+		dummyGroup.POST(
 			"/grpc", func(c *gin.Context) {
-
-				// pilih dummy
-				resp, err := grpcMessageClient.SendMessageDummy(
-					c,
-					&pb.CreateMessageRequest{
-						Name:    "grpc-dummy",
-						Message: "hello from grpc dummy",
-					},
-				)
-				if err != nil {
-					log.Println(err.Error())
-					c.AbortWithStatus(http.StatusInternalServerError)
+				var req requests.CreateGlobalMessage
+				if err := c.ShouldBindJSON(&req); err != nil {
+					c.AbortWithStatus(http.StatusBadRequest)
 					return
 				}
 
-				c.JSON(http.StatusOK, gin.H{"status": "success", "id": resp.Id})
+				if _, err := grpcMessageClient.SendDummyMessage(
+					c,
+					&pb.CreateDummyMessageRequest{
+						Name:    req.Name,
+						Message: req.Message,
+					},
+				); err != nil {
+					log.Println(err.Error())
+					c.AbortWithStatus(http.StatusInternalServerError)
+				} else {
+					c.JSON(http.StatusOK, gin.H{"status": "success"})
+				}
 			},
 		)
-
-		// Dummy REST (GET)
-		groupTest.GET("/rest", func(c *gin.Context) {
-			// langsung balikin string sederhana
-			c.String(http.StatusOK, "hello from REST (GET via worker)")
-		})
-
-		// Dummy gRPC (GET)
-		groupTest.GET("/grpc", func(c *gin.Context) {
-			// langsung balikin string sederhana
-			c.String(http.StatusOK, "hello from gRPC (GET dummy)")
-		})
 	}
 
 	router.GET(

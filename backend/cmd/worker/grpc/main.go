@@ -63,14 +63,11 @@ func (s *MessageServer) SendMessage(_ context.Context, req *pb.CreateMessageRequ
 	}, nil
 }
 
-func (s *MessageServer) SendMessageDummy(_ context.Context, req *pb.CreateMessageRequest) (
-	*pb.CreateMessageResponse, error,
+func (s *MessageServer) SendDummyMessage(_ context.Context, req *pb.CreateDummyMessageRequest) (
+	*pb.CreateDummyMessageResponse, error,
 ) {
-	log.Printf("Dummy receive: name=%s message=%s", req.Name, req.Message)
-
-	// langsung return tanpa DB/MQ
-	return &pb.CreateMessageResponse{
-		Id: 999, // ID dummy
+	return &pb.CreateDummyMessageResponse{
+		Message: req.Message,
 	}, nil
 }
 

@@ -5,8 +5,17 @@ package message;
 option go_package = "pkg/grpc";
 
 service Message {
-  rpc SendMessage (CreateMessageRequest) returns (CreateMessageResponse) {}
-  rpc SendMessageDummy (CreateMessageRequest) returns (CreateMessageResponse);
+  rpc SendMessage (CreateMessageRequest) returns (CreateMessageResponse);
+  rpc SendDummyMessage (CreateDummyMessageRequest) returns (CreateDummyMessageResponse);
+}
+
+message CreateDummyMessageRequest {
+  string name = 1;
+  string message = 2;
+}
+
+message CreateDummyMessageResponse {
+  string message = 1;
 }
 
 message CreateMessageRequest {

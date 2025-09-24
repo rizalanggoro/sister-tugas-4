@@ -97,10 +97,17 @@ func main() {
 			c.JSON(http.StatusOK, gin.H{"status": "success"})
 		},
 	)
-	router.POST("/test-worker", func(c *gin.Context) {
-		// balikin response sederhana
-		c.String(http.StatusOK, "hello from worker")
-	})
+	router.POST(
+		"/dummy-global-messages", func(c *gin.Context) {
+			var req requests.CreateGlobalMessage
+			if err := c.ShouldBindJSON(&req); err != nil {
+				c.AbortWithStatus(http.StatusBadRequest)
+				return
+			}
+
+			c.JSON(http.StatusOK, gin.H{"message": req.Message})
+		},
+	)
 
 	router.Run(":8082")
 }
