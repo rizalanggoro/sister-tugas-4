@@ -75,14 +75,14 @@ func main() {
 		panic(err)
 	}
 
-	q, err := ch.QueueDeclare(
-		"hello-queue",
-		false,
-		false,
-		false,
-		false,
-		nil,
-	)
+	//q, err := ch.QueueDeclare(
+	//	"hello-queue",
+	//	false,
+	//	false,
+	//	false,
+	//	false,
+	//	nil,
+	//)
 
 	group := router.Group("/global-messages")
 	{
@@ -187,30 +187,30 @@ func main() {
 	{
 		// endpoint untuk mereturn string
 		// sifatnya asynchronous
-		groupTest.POST(
-			"/mq", func(c *gin.Context) {
-				msg := Message{Name: "mq", Message: "Hello from MQ!"}
-				// ubah pesan ke dalam bentuk string json
-				body, _ := json.Marshal(msg)
-				if err := ch.Publish(
-					"",
-					q.Name,
-					false,
-					false,
-					amqp.Publishing{
-						ContentType: "application/json",
-						Body:        body,
-					},
-				); err != nil {
-					log.Println(err.Error())
-					c.AbortWithStatus(http.StatusInternalServerError)
-					return
-				}
-
-				// tetap return string sederhana
-				c.String(http.StatusAccepted, "hello from mq")
-			},
-		)
+		//groupTest.POST(
+		//	"/mq", func(c *gin.Context) {
+		//		msg := Message{Name: "mq", Message: "Hello from MQ!"}
+		//		// ubah pesan ke dalam bentuk string json
+		//		body, _ := json.Marshal(msg)
+		//		if err := ch.Publish(
+		//			"",
+		//			q.Name,
+		//			false,
+		//			false,
+		//			amqp.Publishing{
+		//				ContentType: "application/json",
+		//				Body:        body,
+		//			},
+		//		); err != nil {
+		//			log.Println(err.Error())
+		//			c.AbortWithStatus(http.StatusInternalServerError)
+		//			return
+		//		}
+		//
+		//		// tetap return string sederhana
+		//		c.String(http.StatusAccepted, "hello from mq")
+		//	},
+		//)
 
 		// endpoint untuk mereturn string
 		// sifatnya synchronous
@@ -245,38 +245,73 @@ func main() {
 			"/grpc", func(c *gin.Context) {
 
 				// ini malah tetep ke db ya, seharusnya salah tapi bentar aku dah capek
-				if _, err := grpcMessageClient.SendMessage(
-					c, &pb.CreateMessageRequest{
-						Name:    "grpc",
-						Message: "hello from grpc",
-					},
-				); err != nil {
-					log.Println(err.Error())
-					c.AbortWithStatus(http.StatusInternalServerError)
-				} else {
-					c.String(http.StatusOK, "hello from grpc")
-				}
+				// langsung return string sederhana
+				c.String(http.StatusOK, "hello from grpc (dummy response)")
 			},
 		)
 	}
 	// GET endpoint sederhana
-	groupTest.GET(
-		"/mq", func(c *gin.Context) {
-			c.String(http.StatusOK, "GET hello from mq")
+	//groupTest.GET(
+	//	"/mq", func(c *gin.Context) {
+	//		c.String(http.StatusOK, "GET hello from mq")
+	//	},
+	//)
+
+	//groupTest.GET(
+	//	"/rest", func(c *gin.Context) {
+	//		c.String(http.StatusOK, "GET hello from rest")
+	//	},
+	//)
+	//
+	//groupTest.GET(
+	//	"/grpc", func(c *gin.Context) {
+	//		c.String(http.StatusOK, "GET hello from grpc")
+	//	},
+	//)
+
+	router.GET(
+		"/test-worker", func(c *gin.Context) {
+			var messages []models.Message
+			if err := db.Order("created_at desc").Limit(100).Find(&messages).Error; err != nil {
+				c.AbortWithStatus(http.StatusInternalServerError)
+				return
+			}
+			// balik JSON
+			c.JSON(http.StatusOK, responses.GetAllGlobalMessages{
+				Messages: messages,
+			})
 		},
 	)
 
-	groupTest.GET(
-		"/rest", func(c *gin.Context) {
-			c.String(http.StatusOK, "GET hello from rest")
-		},
-	)
+	groupTest.GET("/rest", func(c *gin.Context) {
+		var messages []models.Message
+		if err := db.Order("created_at desc").Limit(100).Find(&messages).Error; err != nil {
+			c.AbortWithStatus(http.StatusInternalServerError)
+			return
+		}
 
-	groupTest.GET(
-		"/grpc", func(c *gin.Context) {
-			c.String(http.StatusOK, "GET hello from grpc")
-		},
-	)
+		// balik JSON
+		c.JSON(http.StatusOK, responses.GetAllGlobalMessages{
+			Messages: messages,
+		})
+	})
+
+	//// di Gin router
+	//groupTest.POST("/grpc", func(c *gin.Context) {
+	//	resp, err := grpcMessageClient.SendMessage(
+	//		context.Background(),
+	//		&pb.CreateMessageRequest{
+	//			Name:    "grpc",
+	//			Message: "hello from grpc",
+	//		},
+	//	)
+	//	if err != nil {
+	//		c.AbortWithStatus(http.StatusInternalServerError)
+	//		return
+	//	}
+	//
+	//	c.JSON(http.StatusOK, resp)
+	//})
 
 	router.GET(
 		"/global-messages", func(c *gin.Context) {
